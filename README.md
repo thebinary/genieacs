@@ -1,65 +1,76 @@
 # GenieACS
 
-GenieACS is a *blazing fast* TR-069 auto configuration server (ACS) built with Node.js, Redis, and MongoDB. It's technology neutral and configurable to fit any service provider needs. This is the core back end component. Official front end GUI is available at https://github.com/zaidka/genieacs-gui.
+GenieACS is a high performance Auto Configuration Server (ACS) for remote
+management of TR-069 enabled devices. It utilizes a declarative and fault
+tolerant configuration engine for automating complex provisioning scenarios at
+scale. It's battle-tested to handle hundreds of thousands and potentially
+millions of concurrent devices.
 
-## Features
+## Quick Start
 
-* **Massively concurrent**: Can handle hundreds of thousands of connected devices on a single server even with low inform interval.
-* **Preset-based configuration**: Define sets of configurations that devices will pick up and apply as needed based on given preconditions.
-* **Tagging**: Use tags to group devices for more manageable presets.
-* **Searching**: Query for devices on any parameter (supports all common operators including regular expressions).
-* **Parameter aliasing**: Define aliases to unify parameter paths from different types of devices. Aliases behave like normal parameters (i.e. can be queried or modified).
-* **Extensive API**: A simple yet rich HTTP-based API allows easy integration with other system.
+Install [Node.js](http://nodejs.org/) and [MongoDB](http://www.mongodb.org/).
+Refer to their corresponding documentation for installation instructions. The
+supported versions are:
 
-## Getting started
+- Node.js: 12.3+
+- MongoDB: 3.6+
 
-Install [Node.js](http://nodejs.org/), [Redis](http://redis.io/), and [MongoDB](http://www.mongodb.org/). Refer to the corresponding documentation for installation guides. Then use NPM to install GenieACS by typing:
+Install GenieACS from NPM:
 
-    npm install -g genieacs
+    sudo npm install -g --unsafe-perm genieacs
 
-You may need to modify the configuration files under "config" directory (in /lib/node_modules/genieacs/config) depending on your setup.
+To build from source instead, clone this repo or download the source archive
+then _cd_ into the source directory then run:
 
-Alternatively, you can install from source by cloning the git repository:
-
-    cd /opt
-    git clone https://github.com/zaidka/genieacs.git --branch v1.0
-    cd genieacs
     npm install
-    npm run configure
-    npm run compile
+    npm run build
 
-Finally, run the following in GNU Screen session or something similar:
+Finally, run the following services (found under `./dist/bin/` if building from
+source):
 
-    genieacs-cwmp
+### genieacs-cwmp
 
-This is the service that the CPEs will communicate with. It listens to port 7547 by default (see config/config.json). Configure the ACS URL of your devices accordingly.
+This is the service that the CPEs will communicate with. It listens on port 7547
+by default. Configure the ACS URL in your devices accordingly.
 
-    genieacs-nbi
+You may optionally use [genieacs-sim](https://github.com/genieacs/genieacs-sim)
+as a dummy TR-069 simulator if you don't have a CPE at hand.
 
-This is the northbound interface module. It exposes a REST API on port 7557 by default. This is needed for the GUI front end to communicate with.
+### genieacs-nbi
 
-    genieacs-fs
+This is the northbound interface module. It exposes a REST API on port 7557 by
+default. This one is only required if you have an external system integrating
+with GenieACS using this API.
 
-This is the file server from which the CPEs will download firmware images and other types of files.
+### genieacs-fs
 
-You can use stream redirection to output to log files:
+This is the file server from which the CPEs will download firmware images and
+such. It listens on port 7567 by default.
 
-    genieacs-cwmp >> /var/log/genieacs-cwmp.log 2>> /var/log/genieacs-cwmp-err.log
-    genieacs-nbi >> /var/log/genieacs-nbi.log 2>> /var/log/genieacs-nbi-err.log
-    genieacs-fs >> /var/log/genieacs-fs.log 2>> /var/log/genieacs-fs-err.log
+### genieacs-ui
 
-For further details about installation and configuration, refer to the [wiki section](https://github.com/zaidka/genieacs/wiki).
+This serves the web based user interface. It listens on port 3000 by default.
+You must pass _--ui-jwt-secret_ argument to supply the secret key used for
+signing browser cookies:
 
-You may now proceed with installing [GenieACS GUI front end](https://github.com/zaidka/genieacs-gui).
+    genieacs-ui --ui-jwt-secret secret
+
+The UI has plenty of configuration options. When you open GenieACS's UI in a
+browser you'll be greeted with a database initialization wizard to help you
+populate some initial configuration.
+
+Visit [docs.genieacs.com](https://docs.genieacs.com) for more documentation and
+a complete installation guide for production deployments.
 
 ## Support
 
-The [Users mailing list](http://lists.genieacs.com) is a good place to get guidance and help from the community. Head on over and join the conversation! In addition, the [wiki](https://github.com/zaidka/genieacs/wiki) provides useful documentation and tips from GenieACS users.
+The [forum](https://forum.genieacs.com) is a good place to get guidance and help
+from the community. Head on over and join the conversation!
 
-You may submit bug reports or feature requests [here](https://github.com/zaidka/genieacs/issues). For device interoperability issues, please consult the mailing list first — it's likely that a workaround already exists.
+For commercial support options, please visit
+[genieacs.com](https://genieacs.com/support/).
 
-For commercial support options and professional services, please visit [genieacs.com](https://genieacs.com).
+## License
 
-## Contributing
-
-Contributions are welcome. Fork this repo and open a pull request and wait for feedback. You can also contribute by enhancing the documentation in the [wiki section](https://github.com/zaidka/genieacs/wiki).
+Copyright 2013-2020 GenieACS Inc. GenieACS is released under the
+[AGPLv3 license terms](https://raw.githubusercontent.com/genieacs/genieacs/master/LICENSE).
